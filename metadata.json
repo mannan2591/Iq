@@ -1,0 +1,6 @@
+{
+  "name": "IQMANIA",
+  "description": "Modern age-adaptive cognitive assessment platform with dynamic difficulty, detailed profile analysis, verified certificates, and daily brain challenges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,228 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information and assessment summaries",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique Firebase Auth user ID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's registered email address",
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name",
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "The user's profile image URL",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last profile update timestamp"
+        }
+      },
+      "required": ["userId", "email", "displayName"]
+    },
+    "AssessmentRecord": {
+      "title": "AssessmentRecord",
+      "description": "Individual cognitive assessment result",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Assessment ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID",
+          "maxLength": 128
+        },
+        "userName": {
+          "type": "string",
+          "description": "Candidate name",
+          "maxLength": 100
+        },
+        "ageGroup": {
+          "type": "string",
+          "description": "Age group category",
+          "maxLength": 50
+        },
+        "estimatedScore": {
+          "type": "number",
+          "description": "Estimated cognitive score"
+        },
+        "percentile": {
+          "type": "number",
+          "description": "Population percentile rank"
+        },
+        "performanceLevel": {
+          "type": "string",
+          "description": "Cognitive performance classification tier",
+          "maxLength": 50
+        },
+        "correctAnswers": {
+          "type": "number",
+          "description": "Total correct responses"
+        },
+        "totalQuestions": {
+          "type": "number",
+          "description": "Total questions presented"
+        },
+        "avgResponseTimeSec": {
+          "type": "number",
+          "description": "Average response time per item in seconds"
+        },
+        "certificateId": {
+          "type": "string",
+          "description": "Associated certificate ID",
+          "maxLength": 128
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Completion ISO date string"
+        }
+      },
+      "required": ["id", "userId", "userName", "estimatedScore", "percentile", "performanceLevel", "certificateId"]
+    },
+    "CertificateRecord": {
+      "title": "CertificateRecord",
+      "description": "Verified certificate data record for public authentication and storage",
+      "type": "object",
+      "properties": {
+        "certificateId": {
+          "type": "string",
+          "description": "Cryptographically formatted unique certificate verification ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "User ID of candidate who earned the certificate",
+          "maxLength": 128
+        },
+        "userName": {
+          "type": "string",
+          "description": "Candidate full name on certificate",
+          "maxLength": 100
+        },
+        "estimatedScore": {
+          "type": "number",
+          "description": "Final score earned"
+        },
+        "percentile": {
+          "type": "number",
+          "description": "Global percentile"
+        },
+        "performanceLevel": {
+          "type": "string",
+          "description": "Performance classification",
+          "maxLength": 50
+        },
+        "issueDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of achievement"
+        },
+        "verificationHash": {
+          "type": "string",
+          "description": "Cryptographic integrity hash",
+          "maxLength": 128
+        }
+      },
+      "required": ["certificateId", "userId", "userName", "estimatedScore", "percentile", "performanceLevel", "issueDate"]
+    },
+    "LeaderboardRecord": {
+      "title": "LeaderboardRecord",
+      "description": "Public leaderboard entry showing verified candidate score and rank",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique entry identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Authenticated user ID who submitted the score",
+          "maxLength": 128
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Candidate public handle or nickname",
+          "maxLength": 50
+        },
+        "score": {
+          "type": "number",
+          "description": "Estimated cognitive score"
+        },
+        "percentile": {
+          "type": "number",
+          "description": "Global percentile rank"
+        },
+        "ageGroup": {
+          "type": "string",
+          "description": "Age cohort category",
+          "maxLength": 50
+        },
+        "completedDate": {
+          "type": "string",
+          "description": "Date string when assessment was completed",
+          "maxLength": 50
+        },
+        "badge": {
+          "type": "string",
+          "description": "Earned cognitive title or badge",
+          "maxLength": 50
+        },
+        "assessmentId": {
+          "type": "string",
+          "description": "Associated assessment result ID",
+          "maxLength": 128
+        }
+      },
+      "required": ["id", "userId", "nickname", "score", "percentile", "ageGroup", "completedDate"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores user profile and account details"
+    },
+    "/users/{userId}/assessments/{assessmentId}": {
+      "schema": {
+        "$ref": "#/entities/AssessmentRecord"
+      },
+      "description": "Stores user cognitive assessment history"
+    },
+    "/public_certificates/{certificateId}": {
+      "schema": {
+        "$ref": "#/entities/CertificateRecord"
+      },
+      "description": "Stores publicly verifiable official IQMANIA certificates"
+    },
+    "/leaderboard/{entryId}": {
+      "schema": {
+        "$ref": "#/entities/LeaderboardRecord"
+      },
+      "description": "Stores real-time global and cohort cognitive leaderboard rankings"
+    }
+  }
+}

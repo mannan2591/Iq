@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny global barrier
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common security and validation helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User profile validation
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.email is string && data.email.size() <= 254 &&
+             data.displayName is string && data.displayName.size() <= 100 &&
+             data.userId == request.auth.uid;
+    }
+
+    // Assessment record validation
+    function isValidAssessmentRecord(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.userName is string && data.userName.size() <= 100 &&
+             data.estimatedScore is number && data.estimatedScore >= 40 && data.estimatedScore <= 200 &&
+             data.percentile is number && data.percentile >= 0 && data.percentile <= 100 &&
+             data.performanceLevel is string && data.performanceLevel.size() <= 50 &&
+             data.certificateId is string && data.certificateId.size() <= 128;
+    }
+
+    // Certificate record validation
+    function isValidCertificateRecord(data) {
+      return data.certificateId is string && data.certificateId.size() <= 128 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.userName is string && data.userName.size() <= 100 &&
+             data.estimatedScore is number && data.estimatedScore >= 40 && data.estimatedScore <= 200 &&
+             data.percentile is number && data.percentile >= 0 && data.percentile <= 100 &&
+             data.performanceLevel is string && data.performanceLevel.size() <= 50;
+    }
+
+    // Leaderboard record validation
+    function isValidLeaderboardRecord(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.nickname is string && data.nickname.size() <= 50 &&
+             data.score is number && data.score >= 40 && data.score <= 200 &&
+             data.percentile is number && data.percentile >= 0 && data.percentile <= 100 &&
+             data.ageGroup is string && data.ageGroup.size() <= 50 &&
+             data.completedDate is string && data.completedDate.size() <= 50;
+    }
+
+    // User profile root collection
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming()) && incoming().userId == existing().userId;
+      allow delete: if false;
+
+      // User assessment history subcollection
+      match /assessments/{assessmentId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(assessmentId) && isValidAssessmentRecord(incoming());
+        allow update: if false; // Immutable audit log
+        allow delete: if isOwner(userId) && isValidId(assessmentId);
+      }
+    }
+
+    // Publicly verifiable certificates (open read for verification, authenticated create by recipient)
+    match /public_certificates/{certificateId} {
+      allow get: if isValidId(certificateId);
+      allow list: if false; // Prevent scraping; only direct verification lookups allowed
+      allow create: if isSignedIn() && isValidId(certificateId) && isValidCertificateRecord(incoming());
+      allow update: if false; // Certificates cannot be modified once issued
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Public cognitive leaderboard records (open read for global and cohort rankings, authenticated writes by owner)
+    match /leaderboard/{entryId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isValidId(entryId) && isValidLeaderboardRecord(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(entryId) && isOwner(existing().userId) && isValidLeaderboardRecord(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && isValidId(entryId) && isOwner(existing().userId);
+    }
+
+    // Connection testing endpoint for health checks
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
