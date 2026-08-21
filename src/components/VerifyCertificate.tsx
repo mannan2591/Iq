@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { CertificateService } from '../services/certificateService';
-import { fetchCertificateFromCloud } from '../services/firestoreService';
 import { CertificateData } from '../types';
 import { 
   ShieldCheck, 
@@ -10,8 +9,7 @@ import {
   Calendar, 
   Award, 
   ArrowRight,
-  Loader2,
-  CloudCheck
+  Loader2
 } from 'lucide-react';
 
 interface VerifyCertificateProps {
@@ -27,7 +25,6 @@ export const VerifyCertificate: React.FC<VerifyCertificateProps> = ({
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CertificateData | null>(null);
-  const [isCloudVerified, setIsCloudVerified] = useState(false);
 
   useEffect(() => {
     if (initialId) {
@@ -35,33 +32,16 @@ export const VerifyCertificate: React.FC<VerifyCertificateProps> = ({
     }
   }, [initialId]);
 
-  const handleLookup = async (idToLookup: string) => {
+  const handleLookup = (idToLookup: string) => {
     const id = idToLookup.trim().toUpperCase();
     if (!id) return;
     setSearchId(id);
     setLoading(true);
     setSearched(false);
-    setIsCloudVerified(false);
 
     try {
-      // Step 1: Check local registry
-      let found = CertificateService.verifyCertificate(id);
-      
-      // Step 2: Check Firestore cloud registry if not found locally
-      if (!found) {
-        try {
-          const cloudCert = await fetchCertificateFromCloud(id);
-          if (cloudCert) {
-            found = cloudCert;
-            setIsCloudVerified(true);
-          }
-        } catch (e) {
-          console.warn('Cloud certificate lookup error:', e);
-        }
-      } else {
-        setIsCloudVerified(true);
-      }
-
+      // Check local verified registry
+      const found = CertificateService.verifyCertificate(id);
       setResult(found);
       setSearched(true);
     } finally {

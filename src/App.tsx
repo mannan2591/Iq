@@ -18,27 +18,17 @@ import { UserDashboard } from './components/UserDashboard';
 import { HowItWorksView } from './components/HowItWorksView';
 import { AdminPanel } from './components/AdminPanel';
 import { Footer } from './components/Footer';
-import { AuthModal } from './components/AuthModal';
 import { CertificateService } from './services/certificateService';
-import { useAuth } from './context/AuthContext';
-import { 
-  saveAssessmentToCloud, 
-  publishCertificateToCloud, 
-  saveLeaderboardEntryToCloud 
-} from './services/firestoreService';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isUserInfoModalOpen, setIsUserInfoModalOpen] = useState<boolean>(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [currentProfile, setCurrentProfile] = useState<UserAssessmentProfile | null>(null);
   const [currentResult, setCurrentResult] = useState<AssessmentResult | null>(null);
   const [selectedCertificate, setSelectedCertificate] = useState<CertificateData | null>(null);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState<boolean>(false);
   const [verifyInitialId, setVerifyInitialId] = useState<string>('');
   const [dailyStreak, setDailyStreak] = useState<number>(() => CertificateService.getDailyStreak().currentStreak);
-
-  const { currentUser } = useAuth();
 
   // Hash-based routing listener (e.g. for #verify/IQM-2026-A82F91 or #daily)
   useEffect(() => {
@@ -77,40 +67,11 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleTestFinished = async (result: AssessmentResult) => {
+  const handleTestFinished = (result: AssessmentResult) => {
     setCurrentResult(result);
     // Persist result and generate certificate data locally
     const cert = CertificateService.saveAssessmentResult(result);
     setSelectedCertificate(cert);
-
-    // If candidate is signed in with Firebase, sync to Firestore
-    if (currentUser) {
-      try {
-        await saveAssessmentToCloud(result, currentUser);
-        await publishCertificateToCloud(cert, currentUser);
-
-        // Record to global & cohort cloud leaderboard
-        const displayName = result.nickname || result.userName.split(' ')[0] + '_' + Math.floor(Math.random() * 100);
-        let badge: string | undefined = undefined;
-        if (result.estimatedScore >= 140) badge = 'Grandmaster';
-        else if (result.estimatedScore >= 130) badge = 'High Logic';
-        else if (result.estimatedScore >= 120) badge = 'Pattern Sage';
-        else if (result.estimatedScore >= 110) badge = 'Advanced Thinker';
-
-        await saveLeaderboardEntryToCloud({
-          id: result.id,
-          nickname: displayName,
-          score: result.estimatedScore,
-          percentile: result.percentile,
-          ageGroup: result.ageGroup,
-          completedDate: cert.issueDate,
-          badge,
-          assessmentId: result.id
-        }, currentUser);
-      } catch (err) {
-        console.warn('Background cloud backup notice:', err);
-      }
-    }
 
     setActiveTab('analysis');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -148,7 +109,6 @@ export default function App() {
         }}
         streakCount={dailyStreak}
         onStartTest={handleStartAssessmentClick}
-        onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Dynamic View Content */}
@@ -231,7 +191,6 @@ export default function App() {
               setSelectedCertificate(cert);
               setIsCertificateModalOpen(true);
             }}
-            onOpenAuthModal={() => setIsAuthModalOpen(true)}
           />
         )}
 
@@ -262,12 +221,6 @@ export default function App() {
         />
       )}
 
-      {/* Firebase Authentication Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
-
       {/* Global Footer */}
       <Footer
         onNavClick={(tab) => {
@@ -279,3 +232,4 @@ export default function App() {
     </div>
   );
 }
+

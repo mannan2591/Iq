@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrainLogo } from './BrainLogo';
-import { useAuth } from '../context/AuthContext';
 import { 
   Play, 
   Flame, 
@@ -11,11 +10,7 @@ import {
   Menu, 
   X, 
   Sparkles,
-  Settings,
-  LogIn,
-  LogOut,
-  User,
-  ChevronDown
+  Settings
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -23,20 +18,15 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   streakCount: number;
   onStartTest: () => void;
-  onOpenAuthModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   streakCount,
-  onStartTest,
-  onOpenAuthModal
+  onStartTest
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { currentUser, userProfile, signOutUser } = useAuth();
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Sparkles },
@@ -50,19 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleNavClick = (tabId: string) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
-    setUserDropdownOpen(false);
   };
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setUserDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-200/80 transition-all">
@@ -104,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right Desktop Actions & Auth User Menu */}
+        {/* Right Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
           {/* Admin link */}
           <button
@@ -115,76 +93,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Settings className="w-4 h-4" />
           </button>
-
-          {/* Authentication Button or User Menu */}
-          {currentUser ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                id="user-profile-menu-btn"
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition-all cursor-pointer"
-              >
-                {currentUser.photoURL ? (
-                  <img
-                    src={currentUser.photoURL}
-                    alt={currentUser.displayName || 'User'}
-                    className="w-6 h-6 rounded-full object-cover border border-indigo-300"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">
-                    {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="text-xs font-bold text-slate-800 max-w-[100px] truncate">
-                  {currentUser.displayName || 'Account'}
-                </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* User Dropdown Menu */}
-              {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white p-2 shadow-2xl border border-slate-200 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                    <p className="text-xs font-bold text-slate-900 truncate">
-                      {currentUser.displayName || 'IQ Candidate'}
-                    </p>
-                    <p className="text-[11px] text-slate-500 font-mono truncate">
-                      {currentUser.email}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => handleNavClick('dashboard')}
-                    className="w-full px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <History className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>My Assessments & Certificates</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      signOutUser();
-                    }}
-                    className="w-full px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button
-              id="nav-sign-in-btn"
-              onClick={onOpenAuthModal}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-            >
-              <LogIn className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Sign In</span>
-            </button>
-          )}
 
           {/* Primary Assessment CTA */}
           <button
@@ -199,34 +107,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile menu action buttons */}
         <div className="flex md:hidden items-center gap-2">
-          {!currentUser ? (
-            <button
-              onClick={onOpenAuthModal}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 flex items-center gap-1"
-            >
-              <LogIn className="w-3 h-3" />
-              <span>Login</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => handleNavClick('dashboard')}
-              className="p-1.5 rounded-full border border-indigo-200"
-            >
-              {currentUser.photoURL ? (
-                <img
-                  src={currentUser.photoURL}
-                  alt="User"
-                  className="w-6 h-6 rounded-full"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">
-                  {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
-                </div>
-              )}
-            </button>
-          )}
-
           <button
             id="mobile-start-btn"
             onClick={onStartTest}
@@ -250,41 +130,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-1.5 shadow-xl animate-in slide-in-from-top-2">
-          {/* User profile card in mobile drawer if signed in */}
-          {currentUser && (
-            <div className="p-3 mb-2 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                {currentUser.photoURL ? (
-                  <img
-                    src={currentUser.photoURL}
-                    alt="User"
-                    className="w-8 h-8 rounded-full"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">
-                    {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs font-bold text-slate-900">{currentUser.displayName || 'Candidate'}</p>
-                  <p className="text-[10px] text-slate-500 font-mono">{currentUser.email}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  signOutUser();
-                }}
-                className="p-2 text-rose-600 hover:bg-rose-100 rounded-xl"
-                title="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -312,19 +157,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            {!currentUser && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenAuthModal();
-                }}
-                className="w-full py-3 rounded-xl text-center font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 flex items-center justify-center gap-2"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Sign in with Google</span>
-              </button>
-            )}
-
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

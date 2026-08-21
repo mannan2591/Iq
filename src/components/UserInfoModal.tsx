@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { UserAssessmentProfile, AgeGroup } from '../types';
 import { AGE_GROUP_RANGES, getAgeGroupFromAge } from '../data/questionBank';
-import { useAuth } from '../context/AuthContext';
 import { 
   User, 
   Sparkles, 
@@ -25,19 +24,12 @@ export const UserInfoModal: React.FC<UserInfoModalProps> = ({
   onClose,
   onStartTest
 }) => {
-  const { currentUser } = useAuth();
   const [step, setStep] = useState<'details' | 'instructions'>('details');
-  const [fullName, setFullName] = useState(currentUser?.displayName || '');
+  const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
   const [ageInput, setAgeInput] = useState<number | ''>(24);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<AgeGroup>('18-25');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (currentUser?.displayName && !fullName) {
-      setFullName(currentUser.displayName);
-    }
-  }, [currentUser]);
 
   if (!isOpen) return null;
 

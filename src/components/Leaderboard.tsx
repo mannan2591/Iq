@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CertificateService } from '../services/certificateService';
-import { getLeaderboardFromCloud } from '../services/firestoreService';
-import { LeaderboardEntry, AgeGroup } from '../types';
-import { useAuth } from '../context/AuthContext';
+import { LeaderboardEntry } from '../types';
 import { 
   Trophy, 
   Medal, 
   Crown, 
-  Filter, 
   Sparkles, 
   Play, 
-  RefreshCw, 
-  Cloud, 
-  User as UserIcon,
-  Flame
+  RefreshCw
 } from 'lucide-react';
 
 interface LeaderboardProps {
@@ -21,54 +15,19 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) => {
-  const { currentUser } = useAuth();
   const [selectedCohort, setSelectedCohort] = useState<string>('all');
   const [entries, setEntries] = useState<LeaderboardEntry[]>(() => CertificateService.getLeaderboard());
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isCloudLive, setIsCloudLive] = useState<boolean>(false);
 
-  // Load from Firestore with local fallback
-  const fetchRankings = async (cohort: string) => {
+  // Load from local CertificateService (supports both past candidate scores and baseline cohorts)
+  const fetchRankings = (cohort: string) => {
     setIsLoading(true);
     try {
-      const cloudEntries = await getLeaderboardFromCloud(cohort === 'all' ? undefined : cohort);
-      const localEntries = CertificateService.getLeaderboard();
-
-      // Merge cloud and local seeded entries without duplicates
-      const mergedMap = new Map<string, LeaderboardEntry>();
-      
-      // Add local/seeded entries first
-      localEntries.forEach(item => {
-        if (cohort === 'all' || item.ageGroup === cohort) {
-          mergedMap.set(item.nickname.toLowerCase(), item);
-        }
-      });
-
-      // Overlay with cloud entries (giving preference to cloud data)
-      if (cloudEntries && cloudEntries.length > 0) {
-        setIsCloudLive(true);
-        cloudEntries.forEach(item => {
-          mergedMap.set(item.nickname.toLowerCase(), item);
-        });
-      }
-
-      // Convert to array and sort descending by score
-      const combined = Array.from(mergedMap.values());
-      combined.sort((a, b) => b.score - a.score || b.percentile - a.percentile);
-
-      // Re-assign ranks 1..N
-      const ranked = combined.map((entry, index) => ({
-        ...entry,
-        rank: index + 1
-      }));
-
-      setEntries(ranked);
-    } catch (err) {
-      console.warn('Leaderboard cloud fetch fallback:', err);
-      // Fall back to local
       const local = CertificateService.getLeaderboard();
       const filtered = cohort === 'all' ? local : local.filter(e => e.ageGroup === cohort);
       setEntries(filtered.map((e, idx) => ({ ...e, rank: idx + 1 })));
+    } catch (err) {
+      console.warn('Leaderboard fetch error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +69,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) =
           Cognitive Leaderboard
         </h1>
         <p className="text-sm text-slate-500 mt-2">
-          Verified estimated cognitive ratings from real-time candidates stored across all age cohorts.
+          Verified estimated cognitive ratings from real-time candidates across all age cohorts.
         </p>
       </div>
 
@@ -158,8 +117,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) =
         {/* Status bar */}
         <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-slate-100 text-xs text-slate-400">
           <div className="flex items-center gap-1.5">
-            <Cloud className="w-3.5 h-3.5 text-indigo-500" />
-            <span>{isCloudLive ? 'Firestore Live Rankings' : 'Global Standings'}</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+            <span>Global Standings</span>
           </div>
           <span>Showing Top {entries.length} Candidates</span>
         </div>
@@ -167,7 +126,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) =
         {isLoading ? (
           <div className="py-16 text-center text-slate-400 text-sm flex flex-col items-center justify-center gap-2">
             <RefreshCw className="w-6 h-6 animate-spin text-indigo-600" />
-            <span>Fetching live rankings...</span>
+            <span>Loading rankings...</span>
           </div>
         ) : entries.length === 0 ? (
           <div className="py-12 text-center text-slate-500 text-sm">
@@ -177,20 +136,14 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) =
           <div className="divide-y divide-slate-100">
             {entries.map((item) => {
               const isTop3 = item.rank <= 3;
-              const isCurrentUser = currentUser && (
-                item.userId === currentUser.uid ||
-                (currentUser.displayName && item.nickname.toLowerCase() === currentUser.displayName.toLowerCase())
-              );
 
               return (
                 <div
                   key={item.id || item.nickname}
                   className={`py-3.5 px-3 sm:px-4 rounded-2xl flex items-center justify-between gap-3 transition-colors ${
-                    isCurrentUser
-                      ? 'bg-indigo-50/80 border border-indigo-200'
-                      : isTop3 
-                        ? 'bg-amber-50/40 hover:bg-amber-50/70' 
-                        : 'hover:bg-slate-50'
+                    isTop3 
+                      ? 'bg-amber-50/40 hover:bg-amber-50/70' 
+                      : 'hover:bg-slate-50'
                   }`}
                 >
                   {/* Rank & Nickname */}
@@ -204,11 +157,6 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onStartAssessment }) =
                         <span className="font-extrabold text-sm sm:text-base text-slate-900 truncate">
                           {item.nickname}
                         </span>
-                        {isCurrentUser && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-600 text-white shadow-xs shrink-0">
-                            YOU
-                          </span>
-                        )}
                         {item.badge && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
                             {item.badge}
