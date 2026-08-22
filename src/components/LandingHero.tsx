@@ -14,6 +14,7 @@ import {
   Clock,
   ChevronRight
 } from 'lucide-react';
+import { IQManiaRocketIcon } from './IQManiaLogo';
 
 interface LandingHeroProps {
   onStartAssessment: () => void;
@@ -226,9 +227,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                 </div>
 
                 {/* Central Glass Brain Interface Card */}
-                <div className="relative z-10 my-auto text-center p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/90 shadow-md">
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 p-3 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 mb-3">
-                    <Brain className="w-10 h-10 animate-pulse" />
+                <div className="relative z-10 my-auto text-center p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-white/90 shadow-md">
+                  <div className="w-18 h-18 mx-auto flex items-center justify-center mb-2 drop-shadow-md">
+                    <IQManiaRocketIcon idPrefix="hero-card" className="w-full h-full" />
                   </div>
                   <h2 className="text-lg font-bold text-slate-900">7 Core Cognitive Domains</h2>
                   <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">

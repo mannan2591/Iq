@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { BrainLogo } from './BrainLogo';
-import { Brain, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Sparkles, CheckCircle2 } from 'lucide-react';
+import { IQManiaRocketIcon } from './IQManiaLogo';
 
 interface AnalysisLoaderProps {
   onComplete: () => void;
@@ -40,11 +40,11 @@ export const AnalysisLoader: React.FC<AnalysisLoaderProps> = ({ onComplete }) =>
         {/* Ambient Top Glow */}
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Pulsing Brain Icon Visual */}
-        <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl animate-ping opacity-25" />
-          <div className="relative w-full h-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/30">
-            <Brain className="w-10 h-10 animate-pulse" />
+        {/* Pulsing Rocket Icon Visual */}
+        <div className="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+          <div className="absolute inset-0 bg-sky-400/20 rounded-full animate-ping opacity-25" />
+          <div className="relative w-full h-full flex items-center justify-center drop-shadow-xl animate-pulse">
+            <IQManiaRocketIcon idPrefix="loader" className="w-full h-full" />
           </div>
         </div>
 

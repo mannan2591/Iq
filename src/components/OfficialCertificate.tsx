@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { CertificateData, PerformanceLevel } from '../types';
 import { Calendar, Download, Printer, ShieldCheck, Check, Sparkles, Award, Loader2, QrCode } from 'lucide-react';
 import { downloadCertificatePdf } from '../utils/pdfExport';
+import { IQManiaRocketIcon } from './IQManiaLogo';
 
 interface OfficialCertificateProps {
   certificate: CertificateData;
@@ -199,11 +200,8 @@ export const OfficialCertificate: React.FC<OfficialCertificateProps> = ({
         </div>
 
         {/* ================= BACKGROUND SECURITY WATERMARK ================= */}
-        <div className="absolute right-12 sm:right-24 top-1/2 -translate-y-1/2 w-64 sm:w-96 h-64 sm:h-96 opacity-[0.035] pointer-events-none select-none">
-          <svg viewBox="0 0 200 200" className="w-full h-full fill-slate-900">
-            <path d="M100 20 C60 20 30 50 30 90 C30 110 40 130 55 145 C60 165 80 180 100 180 C120 180 140 165 145 145 C160 130 170 110 170 90 C170 50 140 20 100 20 Z" />
-            <path d="M100 30 C75 30 50 55 50 85 C50 105 60 120 70 135 C75 150 85 165 100 165 C115 165 125 150 130 135 C140 120 150 105 150 85 C150 55 125 30 100 30 Z" fill="none" stroke="currentColor" strokeWidth="4" />
-          </svg>
+        <div className="absolute right-12 sm:right-24 top-1/2 -translate-y-1/2 w-64 sm:w-80 h-64 sm:h-80 opacity-[0.04] pointer-events-none select-none">
+          <IQManiaRocketIcon idPrefix="cert-wm" className="w-full h-full" />
         </div>
 
         {/* Subtle guilloche dot pattern */}
@@ -241,39 +239,15 @@ export const OfficialCertificate: React.FC<OfficialCertificateProps> = ({
             {/* Brand Logo & Name */}
             <div className="flex flex-col items-center justify-center">
               <div className="flex items-center gap-2 sm:gap-2.5">
-                {/* Two-hemisphere Brain Icon */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 relative flex items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <defs>
-                      <linearGradient id="certBlueV2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#38BDF8" />
-                        <stop offset="100%" stopColor="#2563EB" />
-                      </linearGradient>
-                      <linearGradient id="certOrangeV2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#FBBF24" />
-                        <stop offset="100%" stopColor="#EA580C" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M47 15 C30 15 15 28 15 45 C15 54 19 62 25 68 C22 75 25 84 32 87 C38 90 44 86 47 82 Z"
-                      fill="url(#certBlueV2)"
-                    />
-                    <path d="M28 35 Q36 38 32 48 Q26 55 35 62 Q38 72 45 74" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-                    <path d="M20 48 Q28 50 25 58" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-                    
-                    <path
-                      d="M53 15 C70 15 85 28 85 45 C85 54 81 62 75 68 C78 75 75 84 68 87 C62 90 56 86 53 82 Z"
-                      fill="url(#certOrangeV2)"
-                    />
-                    <path d="M72 35 Q64 38 68 48 Q74 55 65 62 Q62 72 55 74" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-                    <path d="M80 48 Q72 50 75 58" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-                  </svg>
+                {/* IQ Mania Rocket Brain Icon */}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 relative flex items-center justify-center shrink-0">
+                  <IQManiaRocketIcon idPrefix="cert-hdr" className="w-full h-full drop-shadow-sm" />
                 </div>
 
-                {/* IQ mania Brand */}
+                {/* IQ Mania Brand */}
                 <div className="text-2xl sm:text-3xl font-black tracking-tight text-[#0A192F] font-display flex items-baseline">
                   <span>IQ</span>
-                  <span className="font-medium text-slate-800 ml-0.5">mania</span>
+                  <span className="font-bold text-[#0284C7] ml-0.5">Mania</span>
                 </div>
               </div>
 
