@@ -452,15 +452,15 @@ export const OfficialCertificate: React.FC<OfficialCertificateProps> = ({
               <div className="text-right flex flex-col items-end pr-2 sm:pr-6 z-20 -translate-y-3 sm:-translate-y-5 md:-translate-y-6">
                 {/* Clean Calligraphic Handwritten Signature */}
                 <div className="font-signature text-2xl sm:text-3xl md:text-4xl text-[#0A192F] leading-none mb-0.5 font-bold tracking-normal drop-shadow-xs">
-                  Julian Sterling
+                  Mannan
                 </div>
                 
                 <div className="text-[9px] sm:text-[11px] font-black tracking-widest text-[#0A192F] uppercase">
-                  DR. JULIAN STERLING
+                  MANNAN
                 </div>
                 
                 <div className="text-[7.5px] sm:text-[8.5px] font-bold tracking-wider text-slate-600 uppercase">
-                  COGNITIVE ASSESSMENT DIRECTOR
+                  DIRECTOR OF HYPERSTUDIO
                 </div>
                 
                 <div className="w-24 sm:w-32 h-[1.5px] bg-[#C59B27] mt-1" />
