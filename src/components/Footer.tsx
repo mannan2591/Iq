@@ -69,11 +69,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onStartAssessment })
                     How It Works
                   </button>
                 </li>
-                <li>
-                  <button onClick={() => onNavClick('admin')} className="hover:text-indigo-600 transition-colors cursor-pointer">
-                    Admin Question Bank
-                  </button>
-                </li>
               </ul>
             </div>
           </div>

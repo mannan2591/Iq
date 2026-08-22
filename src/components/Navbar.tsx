@@ -9,8 +9,7 @@ import {
   History, 
   Menu, 
   X, 
-  Sparkles,
-  Settings
+  Sparkles
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -84,16 +83,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Admin link */}
-          <button
-            id="nav-admin-btn"
-            onClick={() => handleNavClick('admin')}
-            title="Question Bank Manager"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
           {/* Primary Assessment CTA */}
           <button
             id="nav-start-assessment-btn"
@@ -166,14 +155,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Start Cognitive Assessment</span>
-            </button>
-
-            <button
-              onClick={() => handleNavClick('admin')}
-              className="w-full py-2 text-xs text-slate-600 text-center flex items-center justify-center gap-1"
-            >
-              <Settings className="w-3.5 h-3.5" />
-              <span>Admin Question Bank</span>
             </button>
           </div>
         </div>

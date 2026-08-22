@@ -16,7 +16,6 @@ import { DailyChallenge } from './components/DailyChallenge';
 import { Leaderboard } from './components/Leaderboard';
 import { UserDashboard } from './components/UserDashboard';
 import { HowItWorksView } from './components/HowItWorksView';
-import { AdminPanel } from './components/AdminPanel';
 import { Footer } from './components/Footer';
 import { CertificateService } from './services/certificateService';
 
@@ -197,11 +196,6 @@ export default function App() {
         {/* 9. How It Works & Framework Documentation */}
         {activeTab === 'how-it-works' && (
           <HowItWorksView onStartAssessment={handleStartAssessmentClick} />
-        )}
-
-        {/* 10. Admin Question Bank Manager */}
-        {activeTab === 'admin' && (
-          <AdminPanel onBackToApp={() => setActiveTab('home')} />
         )}
       </main>
 
